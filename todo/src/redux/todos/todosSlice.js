@@ -12,7 +12,7 @@ export const getTodosAsync = createAsyncThunk(
 export const addTodosAsync = createAsyncThunk(
   "todos/addTodosAsync",
   async (data) => {
-    const res = await axios.post("http://localhost:7000/todos", data);
+    const res = await axios.post("http://localhost:700/todos", data);
     return res.data;
   }
 );
@@ -24,6 +24,8 @@ export const todosSlice = createSlice({
     isLoading: false,
     error: null,
     activeFilter: "all",
+    addNewTodoIsLoading: false,
+    addNewTodoError: null,
   },
   reducers: {
     toggle: (state, action) => {
@@ -56,8 +58,16 @@ export const todosSlice = createSlice({
       state.isLoading = false;
       state.error = action.error.massage;
     },
+    [addTodosAsync.pending]: (state, action) => {
+      state.addNewTodoLoading = true;
+    },
     [addTodosAsync.fulfilled]: (state, action) => {
       state.items.push(action.payload);
+      state.addNewTodoIsLoading = false;
+    },
+    [addTodosAsync.rejected]: (state, action) => {
+      state.addNewTodoIsLoading = false;
+      state.addNewTodoError = action.error.massage;
     },
   },
 });
