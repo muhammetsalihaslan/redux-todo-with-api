@@ -33,13 +33,21 @@ export const deleteTodoAsync = createAsyncThunk(
   }
 );
 
+export const clearCompletedTodoAsync = createAsyncThunk(
+  "todos/clearCompletedTodoAsync",
+  async ({ id, data }) => {
+    const res = await axios.delete(`http://localhost:7000/todos/${id}`, data);
+    return res.data;
+  }
+);
+
 export const todosSlice = createSlice({
   name: "todos",
   initialState: {
     items: [],
     isLoading: false,
     error: null,
-    activeFilter: "all",
+    activeFilter: localStorage.getItem("activeFilter"),
     addNewTodoIsLoading: false,
     addNewTodoError: null,
   },
@@ -83,6 +91,10 @@ export const todosSlice = createSlice({
     [deleteTodoAsync.fulfilled]: (state, action) => {
       const { id } = action.payload;
       const filtered = state.items.filter((item) => item.id !== id);
+      state.items = filtered;
+    },
+    [clearCompletedTodoAsync.fulfilled]: (state) => {
+      const filtered = state.items.filter((item) => item.completed === false);
       state.items = filtered;
     },
   },
